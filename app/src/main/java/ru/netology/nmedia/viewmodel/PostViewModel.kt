@@ -1,8 +1,6 @@
 package ru.netology.nmedia.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import ru.netology.nmedia.Post
 import ru.netology.nmedia.repository.InMemoryPostRepository
 import ru.netology.nmedia.repository.PostRepository
 
