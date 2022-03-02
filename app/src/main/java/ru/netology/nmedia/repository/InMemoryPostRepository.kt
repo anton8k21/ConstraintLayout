@@ -7,7 +7,7 @@ import ru.netology.nmedia.Post
 class InMemoryPostRepository: PostRepository {
 
 
-    private var post = List(1_000){
+    private var posts = List(1_000){
         Post(
             id = it.toLong(),
         author = "Нетология. Университет интернет-профессий будущего",
@@ -17,9 +17,9 @@ class InMemoryPostRepository: PostRepository {
     )
     }.reversed()
 
-    private val _data = MutableLiveData(post)
+    private val _data = MutableLiveData(posts)
     override fun likeById(id: Long) {
-        post = post.map {post ->
+        posts = posts.map { post ->
             if (post.id == id ) {
                     post.copy(likedByMe = !post.likedByMe, likesCount = if(post.likedByMe) post.likesCount - 1 else post.likesCount + 1)
                 } else {
@@ -27,20 +27,40 @@ class InMemoryPostRepository: PostRepository {
 
             }
         }
-        _data.value = post
+        _data.value = posts
     }
 
     override fun repostById(id: Long) {
-        post = post.map { post ->
+        posts = posts.map { post ->
             if (post.id == id) {
                 post.copy(repostSum = post.repostSum + 1 )
             } else {
                 post
             }
         }
-        _data.value = post
+        _data.value = posts
     }
 
+    override fun removeById(id: Long) {
+        posts = posts.filter {
+            it.id != id
+        }
+        _data.value = posts
+    }
+
+    override fun save(post: Post) {
+        if (post.id == 0L){
+            val newId = posts.firstOrNull()?.id?: post.id
+            posts = listOf(post.copy(id = newId + 1)) + posts
+
+            _data.value = posts
+            return
+        }
+        posts = posts.map {
+            if (it.id != post.id) it else it.copy(content = post.content)
+        }
+        _data.value = posts
+    }
 
     override fun get(): LiveData<List<Post>> = _data
 }

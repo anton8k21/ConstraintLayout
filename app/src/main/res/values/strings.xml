@@ -3,4 +3,9 @@
     <string name="number_likes">0</string>
     <string name="number_repost">12</string>
     <string name="number_views">42</string>
+    <string name="post_remove">Remove</string>
+    <string name="Text_content">Введите текст контента</string>
+    <string name="ok">ok</string>
+    <string name="edit">Edit</string>
+    <string name="undo_changes">Отменить изменения</string>
 </resources>

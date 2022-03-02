@@ -1,20 +1,28 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.Post
 import ru.netology.nmedia.R
 import ru.netology.nmedia.DisplayingNumbers
+import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.databinding.CardPostBinding
-typealias LikeClickListener = (Post) -> Unit
-typealias RepostClickListener = (Post) -> Unit
+import java.util.*
+
+interface ClickListener{
+    fun onLike(post: Post){}
+    fun onRepost(post: Post){}
+    fun onRemove(post: Post){}
+    fun onEdit(post: Post){}
+}
 
 class PostAdapter(
-    private val likeClickListener: LikeClickListener,
-    private val repostClickListener: RepostClickListener,
+    private val clickListener: ClickListener
 ): ListAdapter<Post, PostViewHolder>(PostDiffItemCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder =
@@ -23,8 +31,7 @@ class PostAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false),
-                    likeClickListener = likeClickListener,
-            repostClickListener = repostClickListener
+                    clickListener = clickListener,
        )
 
 
@@ -36,11 +43,10 @@ class PostAdapter(
 }
 
 class PostViewHolder(
-    private val likeClickListener: LikeClickListener,
-    private val repostClickListener: RepostClickListener,
-    private val binding: CardPostBinding
+    private val clickListener: ClickListener,
+    private val binding: CardPostBinding,
 ): RecyclerView.ViewHolder(binding.root){
-    val displayingNumbers = DisplayingNumbers()
+    private val displayingNumbers = DisplayingNumbers()
 
     fun bind(post: Post){
         with(binding) {
@@ -53,10 +59,29 @@ class PostViewHolder(
                 if (post.likedByMe)  R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
             )
             likes.setOnClickListener {
-                likeClickListener(post)
+                clickListener.onLike(post)
             }
             repost.setOnClickListener {
-                repostClickListener(post)
+                clickListener.onRepost(post)
+            }
+            menu.setOnClickListener {
+                PopupMenu(binding.root.context,binding.menu).apply {
+                    inflate(R.menu.post_menu)
+                    setOnMenuItemClickListener {
+                        when(it.itemId){
+                            R.id.remove -> {
+                                clickListener.onRemove(post)
+                                true
+                            }
+                            R.id.edit -> {
+                                clickListener.onEdit(post)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+
+                }.show()
             }
         }
         }

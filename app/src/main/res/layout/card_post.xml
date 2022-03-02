@@ -13,6 +13,7 @@
         android:layout_height="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_launcher_foreground"
         tools:srcCompat="@sample/posts_avatars" />
 
     <TextView
