@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.App.MenuCheckBox" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:minWidth">0dp</item>
+    </style>
+</resources>

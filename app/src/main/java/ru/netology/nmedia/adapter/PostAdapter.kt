@@ -53,11 +53,12 @@ class PostViewHolder(
             author.text = post.author
             content.text = post.content
             published.text = post.published
-            repostSum.text = displayingNumbers.displaying(post.repostSum).toString()
-            likesSum.text = displayingNumbers.displaying(post.likesCount).toString()
-            likes.setImageResource(
-                if (post.likedByMe)  R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
-            )
+            repost.text = post.repostSum.toString()
+            likes.isChecked = post.likedByMe
+            likes.text = post.likesCount.toString()
+//            likes.setImageResource(
+ //               if (post.likedByMe)  R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
+ //           )
             likes.setOnClickListener {
                 clickListener.onLike(post)
             }
