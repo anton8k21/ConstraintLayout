@@ -1,16 +1,19 @@
-package ru.netology.nmedia
+package ru.netology.nmedia.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.launch
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import ru.netology.nmedia.Post
 import ru.netology.nmedia.adapter.ClickListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
+import ru.netology.nmedia.databinding.ActivityNewPostBinding
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewmodel.PostViewModel
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,6 +21,15 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val viewModel: PostViewModel by viewModels()
+
+        val newPostContract = registerForActivityResult(NewPostActivity.Contract()){ result ->
+            result?.let {
+                viewModel.changeContent(result)
+                viewModel.save()
+            }
+
+        }
+
         val adapter = PostAdapter(
             object : ClickListener {
                 override fun onLike(post: Post) {
@@ -25,6 +37,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onRepost(post: Post) {
+                    val intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, post.content)
+                    }
+                    val repostIntent = Intent.createChooser(intent,"Поделиться")
+                    startActivity(repostIntent)
                     viewModel.repostById(post.id)
                 }
 
@@ -42,51 +61,19 @@ class MainActivity : AppCompatActivity() {
         viewModel.data.observe(this) { posts ->
             adapter.submitList(posts)
         }
+        binding.add.setOnClickListener {
+            newPostContract.launch()
+        }
 
         viewModel.edited.observe(this) {
             if (it.id == 0L) {
-                binding.deleteTextContent.visibility = View.GONE
-                binding.textUndoChanges.visibility = View.GONE
                 return@observe
             }
-            with(binding) {
-                deleteTextContent.visibility = View.VISIBLE
-                textUndoChanges.visibility = View.VISIBLE
-                editContent.requestFocus()
-                deleteTextContent.setOnClickListener {
-                    editContent.setText(viewModel.edited.value?.content)
-                    viewModel.changeContent(editContent.text.toString())
-                    viewModel.save()
-                    editContent.setText("")
-                    editContent.clearFocus()
-                    AndroidUtils.hideKeyboard(binding.save)
-                    deleteTextContent.visibility = View.GONE
-                    textUndoChanges.visibility = View.GONE
-                }
-                editContent.setText(it.content)
-
-
-            }
+            val bindingNewPost = ActivityNewPostBinding.inflate(layoutInflater)
+            bindingNewPost.editContent.setText(it.content)
+            newPostContract.launch()
         }
-
-
-        binding.save.setOnClickListener {
-            with(binding.editContent) {
-                if (text.isNullOrBlank()) {
-                    Toast.makeText(this@MainActivity, "Content empty", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                } else {
-                    viewModel.changeContent(text.toString())
-                    viewModel.save()
-
-                    setText("")
-                    clearFocus()
-                    AndroidUtils.hideKeyboard(this)
-                }
-            }
-
-        }
-
+    }
 
     }
-}
+
