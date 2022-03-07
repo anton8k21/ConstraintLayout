@@ -16,6 +16,11 @@ class NewPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityNewPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        intent?.getStringExtra(Intent.EXTRA_TEXT).let {
+            binding.editContent.setText(it)
+        }
+
         binding.editContent.requestFocus()
         binding.save.setOnClickListener{
             val text = binding.editContent.text.toString()
@@ -34,9 +39,9 @@ class NewPostActivity : AppCompatActivity() {
 
     }
 
-    class Contract : ActivityResultContract<Unit,String?>(){
-        override fun createIntent(context: Context, input: Unit): Intent {
-            return Intent(context, NewPostActivity :: class.java)
+    class Contract : ActivityResultContract<String,String?>(){
+        override fun createIntent(context: Context, input: String): Intent {
+            return Intent(context, NewPostActivity :: class.java).apply { putExtra(Intent.EXTRA_TEXT, input)}
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): String? {

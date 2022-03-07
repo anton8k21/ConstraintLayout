@@ -19,6 +19,7 @@ interface ClickListener{
     fun onRepost(post: Post){}
     fun onRemove(post: Post){}
     fun onEdit(post: Post){}
+    fun onPlayVideo(post: Post){}
 }
 
 class PostAdapter(
@@ -34,8 +35,6 @@ class PostAdapter(
                     clickListener = clickListener,
        )
 
-
-
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position)
         holder.bind(post)
@@ -50,9 +49,14 @@ class PostViewHolder(
 
     fun bind(post: Post){
         with(binding) {
+            if (post.urlVideo == ""){
+                postVideo.visibility = View.GONE
+            }else
+                postVideo.visibility = View.VISIBLE
             author.text = post.author
             content.text = post.content
             published.text = post.published
+            urlVideo.setText(post.urlVideo)
             repost.text = post.repostSum.toString()
             likes.isChecked = post.likedByMe
             likes.text = post.likesCount.toString()
@@ -64,6 +68,9 @@ class PostViewHolder(
             }
             repost.setOnClickListener {
                 clickListener.onRepost(post)
+            }
+            addVideo.setOnClickListener {
+                clickListener.onPlayVideo(post)
             }
             menu.setOnClickListener {
                 PopupMenu(binding.root.context,binding.menu).apply {

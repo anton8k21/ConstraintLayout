@@ -10,6 +10,7 @@ import ru.netology.nmedia.repository.PostRepository
 val empty = Post(
     id = 0,
     author = "",
+    urlVideo = "",
     published = "",
     content = "",
     likedByMe = false,
@@ -26,6 +27,8 @@ class PostViewModel: ViewModel() {
     fun repostById(id: Long) = repository.repostById(id)
 
     fun removeById(id: Long) = repository.removeById(id)
+
+    fun onPlayVideo(text: String, id: Long) = repository.onPlayVideo(text,id)
 
     val data = repository.get()
 

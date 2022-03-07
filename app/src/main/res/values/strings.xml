@@ -8,4 +8,5 @@
     <string name="ok">ok</string>
     <string name="edit">Edit</string>
     <string name="undo_changes">Отменить изменения</string>
+    <string name="add_url_video">Введите сыллку на видео</string>
 </resources>

@@ -1,18 +1,16 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import androidx.activity.result.launch
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.nmedia.Post
 import ru.netology.nmedia.adapter.ClickListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
-import ru.netology.nmedia.databinding.ActivityNewPostBinding
-import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +52,16 @@ class MainActivity : AppCompatActivity() {
                 override fun onEdit(post: Post) {
                     viewModel.edit(post)
                 }
+
+                override fun onPlayVideo(post: Post) {
+                    val bindingPost = CardPostBinding.inflate(layoutInflater)
+                    viewModel.onPlayVideo(bindingPost.urlVideo.text.toString(), post.id)
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.urlVideo))
+                    val videoIntent = Intent.createChooser(intent,"")
+                    startActivity(videoIntent)
+                    bindingPost.urlVideo.visibility = View.GONE
+                }
+
             }
         )
 
@@ -62,17 +70,16 @@ class MainActivity : AppCompatActivity() {
             adapter.submitList(posts)
         }
         binding.add.setOnClickListener {
-            newPostContract.launch()
+            newPostContract.launch("")
         }
 
         viewModel.edited.observe(this) {
             if (it.id == 0L) {
                 return@observe
             }
-            val bindingNewPost = ActivityNewPostBinding.inflate(layoutInflater)
-            bindingNewPost.editContent.setText(it.content)
-            newPostContract.launch()
+            newPostContract.launch(it.content)
         }
+
     }
 
     }
