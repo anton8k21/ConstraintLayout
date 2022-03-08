@@ -19,7 +19,7 @@ interface ClickListener{
     fun onRepost(post: Post){}
     fun onRemove(post: Post){}
     fun onEdit(post: Post){}
-    fun onPlayVideo(post: Post){}
+    fun onPlayVideo(url: String, id: Long){}
 }
 
 class PostAdapter(
@@ -70,7 +70,10 @@ class PostViewHolder(
                 clickListener.onRepost(post)
             }
             addVideo.setOnClickListener {
-                clickListener.onPlayVideo(post)
+                clickListener.onPlayVideo(urlVideo.text.toString(), post.id)
+                urlVideo.visibility = View.GONE
+                postVideo.visibility = View.VISIBLE
+                addVideo.visibility = View.GONE
             }
             menu.setOnClickListener {
                 PopupMenu(binding.root.context,binding.menu).apply {

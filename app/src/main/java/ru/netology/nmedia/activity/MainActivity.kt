@@ -53,13 +53,11 @@ class MainActivity : AppCompatActivity() {
                     viewModel.edit(post)
                 }
 
-                override fun onPlayVideo(post: Post) {
-                    val bindingPost = CardPostBinding.inflate(layoutInflater)
-                    viewModel.onPlayVideo(bindingPost.urlVideo.text.toString(), post.id)
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.urlVideo))
+                override fun onPlayVideo(url: String, id: Long) {
+                    viewModel.onPlayVideo(url, id)
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     val videoIntent = Intent.createChooser(intent,"")
                     startActivity(videoIntent)
-                    bindingPost.urlVideo.visibility = View.GONE
                 }
 
             }
