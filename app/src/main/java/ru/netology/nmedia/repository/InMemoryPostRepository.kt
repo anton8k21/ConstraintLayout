@@ -1,24 +1,40 @@
 package ru.netology.nmedia.repository
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import ru.netology.nmedia.Post
 
-class InMemoryPostRepository: PostRepository {
-
-
-    private var posts = List(1_000){
-        Post(
-            id = it.toLong(),
-            urlVideo = "",
-        author = "Нетология. Университет интернет-профессий будущего",
-        published = "21 мая в 18:36",
-        content = "$it Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb",
-            likedByMe = false
-    )
-    }.reversed()
-
+class InMemoryPostRepository(
+    private val context: Context
+): PostRepository {
+    private val gson = Gson()
+    private val type = TypeToken.getParameterized(List::class.java, Post::class.java).type
+    private val fileName = "posts.json"
+    private val nextId = 1L
+    private var posts = emptyList<Post>()
     private val _data = MutableLiveData(posts)
+
+    init {
+        val file = context.filesDir.resolve(fileName)
+        if (file.exists()){
+            context.openFileInput(fileName).bufferedReader().use {
+                posts = gson.fromJson(it,type)
+                _data.value = posts
+            }
+        }else{
+            sync()
+        }
+    }
+
+    private fun sync(){
+        context.openFileOutput(fileName, Context.MODE_PRIVATE).bufferedWriter().use {
+            it.write(gson.toJson(posts))
+        }
+    }
+
     override fun likeById(id: Long) {
         posts = posts.map { post ->
             if (post.id == id ) {
@@ -29,6 +45,7 @@ class InMemoryPostRepository: PostRepository {
             }
         }
         _data.value = posts
+        sync()
     }
 
     override fun repostById(id: Long) {
@@ -40,6 +57,7 @@ class InMemoryPostRepository: PostRepository {
             }
         }
         _data.value = posts
+        sync()
     }
 
     override fun onPlayVideo(text: String, id: Long) {
@@ -57,6 +75,7 @@ class InMemoryPostRepository: PostRepository {
             it.id != id
         }
         _data.value = posts
+        sync()
     }
 
     override fun save(post: Post) {
@@ -65,12 +84,14 @@ class InMemoryPostRepository: PostRepository {
             posts = listOf(post.copy(id = newId + 1)) + posts
 
             _data.value = posts
+            sync()
             return
         }
         posts = posts.map {
             if (it.id != post.id) it else it.copy(content = post.content)
         }
         _data.value = posts
+        sync()
     }
 
     override fun get(): LiveData<List<Post>> = _data
