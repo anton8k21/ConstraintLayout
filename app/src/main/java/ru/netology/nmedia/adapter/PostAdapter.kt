@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.Post
 import ru.netology.nmedia.R
 import ru.netology.nmedia.DisplayingNumbers
-import ru.netology.nmedia.databinding.ActivityMainBinding
+
 import ru.netology.nmedia.databinding.CardPostBinding
 import java.util.*
 
@@ -20,6 +20,7 @@ interface ClickListener{
     fun onRemove(post: Post){}
     fun onEdit(post: Post){}
     fun onPlayVideo(url: String, id: Long){}
+    fun openCardPost(post: Post){}
 }
 
 class PostAdapter(
@@ -68,6 +69,9 @@ class PostViewHolder(
             }
             repost.setOnClickListener {
                 clickListener.onRepost(post)
+            }
+            content.setOnClickListener{
+                clickListener.openCardPost(post)
             }
             addVideo.setOnClickListener {
                 clickListener.onPlayVideo(urlVideo.text.toString(), post.id)

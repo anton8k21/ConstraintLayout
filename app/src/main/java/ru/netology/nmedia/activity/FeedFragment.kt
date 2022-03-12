@@ -3,35 +3,43 @@ package ru.netology.nmedia.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.Post
+import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.activity.PostContent.Companion.longArg
 import ru.netology.nmedia.adapter.ClickListener
 import ru.netology.nmedia.adapter.PostAdapter
-import ru.netology.nmedia.databinding.ActivityMainBinding
-import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.databinding.FeedFragmentBinding
+import ru.netology.nmedia.databinding.PostFragmentBinding
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        val viewModel: PostViewModel by viewModels()
+class FeedFragment : Fragment() {
 
-        val newPostContract = registerForActivityResult(NewPostActivity.Contract()){ result ->
-            result?.let {
-                viewModel.changeContent(result)
-                viewModel.save()
-            }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = FeedFragmentBinding.inflate(layoutInflater)
+        val viewModel: PostViewModel by viewModels(::requireParentFragment)
 
-        }
 
         val adapter = PostAdapter(
             object : ClickListener {
                 override fun onLike(post: Post) {
                     viewModel.likeById(post.id)
+                }
+
+                override fun openCardPost(post: Post) {
+                    findNavController().navigate(R.id.action_feedFragment_to_postContent,
+                    Bundle().apply
+                     {longArg = post.id})
                 }
 
                 override fun onRepost(post: Post) {
@@ -40,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, post.content)
                     }
-                    val repostIntent = Intent.createChooser(intent,"Поделиться")
+                    val repostIntent = Intent.createChooser(intent, "Поделиться")
                     startActivity(repostIntent)
                     viewModel.repostById(post.id)
                 }
@@ -56,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onPlayVideo(url: String, id: Long) {
                     viewModel.onPlayVideo(url, id)
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    val videoIntent = Intent.createChooser(intent,"")
+                    val videoIntent = Intent.createChooser(intent, "")
                     startActivity(videoIntent)
                 }
 
@@ -64,21 +72,30 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.list.adapter = adapter
-        viewModel.data.observe(this) { posts ->
+        viewModel.data.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
         }
+
         binding.add.setOnClickListener {
-            newPostContract.launch("")
+            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+
+
+
         }
 
-        viewModel.edited.observe(this) {
+        viewModel.edited.observe(viewLifecycleOwner) {
             if (it.id == 0L) {
                 return@observe
             }
-            newPostContract.launch(it.content)
+
+            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment,
+            Bundle().apply { textArg = it.content})
+
         }
-
+        return binding.root
     }
 
-    }
+}
+
+
 
