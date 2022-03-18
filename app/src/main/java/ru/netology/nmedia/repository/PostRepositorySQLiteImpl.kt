@@ -20,6 +20,7 @@ class PostRepositorySQLiteImpl(
     override fun likeById(id: Long) {
         posts = posts.map { post ->
             if (post.id == id ) {
+                dao.likeById(id)
                     post.copy(likedByMe = !post.likedByMe, likesCount = if(post.likedByMe) post.likesCount - 1 else post.likesCount + 1)
                 } else {
                     post
@@ -32,6 +33,7 @@ class PostRepositorySQLiteImpl(
     override fun repostById(id: Long) {
         posts = posts.map { post ->
             if (post.id == id) {
+                dao.repostById(id)
                 post.copy(repostSum = post.repostSum + 1 )
             } else {
                 post
@@ -43,6 +45,7 @@ class PostRepositorySQLiteImpl(
     override fun onPlayVideo(text: String, id: Long) {
         posts = posts.map { post ->
             if (post.id == id) {
+                dao.onPlayVideo(text,id)
                 post.copy(urlVideo = text)
             } else {
                 post
@@ -56,6 +59,7 @@ class PostRepositorySQLiteImpl(
         posts = posts.filter {
             it.id != id
         }
+        dao.removeById(id)
         _data.value = posts
     }
 

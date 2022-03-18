@@ -55,7 +55,8 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             """
                 UPDATE posts SET
                 repostSum = repostSum + 1
-                """.trimIndent()
+                WHERE id = ?
+                """.trimIndent(), arrayOf(id)
         )
 
     }
@@ -77,6 +78,7 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
             put(PostColumns.COLUMN_AUTHOR, "Me")
             put(PostColumns.COLUMN_CONTENT, post.content)
             put(PostColumns.COLUMN_PUBLISHED, "new")
+            put(PostColumns.COLUMN_URL_VIDEO, "")
         }
         val id = db.replace(PostColumns.TABLE, null, values)
         db.query(
@@ -94,7 +96,13 @@ class PostDaoImpl(private val db: SQLiteDatabase) : PostDao {
     }
 
     override fun onPlayVideo(text: String, id: Long) {
-        TODO("Not yet implemented")
+        db.execSQL(
+            """ 
+                UPDATE posts SET
+                urlVideo = "${text}"
+                WHERE id = ?
+            """.trimIndent(), arrayOf(id)
+        )
     }
 
     private fun map(cursor: Cursor): Post {
