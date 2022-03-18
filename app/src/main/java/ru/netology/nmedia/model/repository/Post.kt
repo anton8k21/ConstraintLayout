@@ -1,4 +1,4 @@
-package ru.netology.nmedia
+package ru.netology.nmedia.model.repository
 
 data class Post(
     var id: Long = 0L,

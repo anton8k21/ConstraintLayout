@@ -1,4 +1,4 @@
-package ru.netology.nmedia.adapter
+package ru.netology.nmedia.model.repository.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,12 +7,11 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import ru.netology.nmedia.Post
+import ru.netology.nmedia.model.repository.Post
 import ru.netology.nmedia.R
-import ru.netology.nmedia.DisplayingNumbers
+import ru.netology.nmedia.model.repository.DisplayingNumbers
 
 import ru.netology.nmedia.databinding.CardPostBinding
-import java.util.*
 
 interface ClickListener{
     fun onLike(post: Post){}
