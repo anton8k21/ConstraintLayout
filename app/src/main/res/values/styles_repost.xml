@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.App.repostButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+    <item name="android:minWidth">0dp</item>
+        <item name="iconPadding">8dp</item>
+    </style>
+</resources>
